@@ -1,0 +1,31 @@
+{
+    "name": "2upmedia/freshbooks-importer",
+    "description": "Imports Harvest Time Entries into Freshbooks so that they can be billed",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jorge Colon",
+            "email": "jorge@2upmedia.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "illuminate/console": "^5.5",
+        "illuminate/support": "^5.5",
+        "league/csv": "^9.0",
+        "rtconner/freshbooks-api": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "_2UpMedia\\FreshbooksImporter\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "_2UpMedia\\FreshbooksImporter\\FreshbooksImporterServiceProvider"
+            ]
+        }
+    }
+}
