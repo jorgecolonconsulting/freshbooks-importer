@@ -8,6 +8,8 @@
 
 namespace _2UpMedia\FreshbooksImporter\Importer;
 
+use _2UpMedia\FreshbooksImporter\Commands\ListProjectsCommand;
+use _2UpMedia\FreshbooksImporter\Commands\ListTasksCommand;
 use Freshbooks\FreshBooksApi;
 use Illuminate\Console\Command;
 use League\Csv\Reader;
@@ -19,10 +21,32 @@ class FreshbooksClassic
      */
     private $fbApi;
 
-    public function __construct()
+    /**
+     * @var array
+     */
+    private $unknownTasks = [];
+
+    /**
+     * @var array
+     */
+    private $unknownProjects = [];
+
+    /**
+     * @var ListProjectsCommand
+     */
+    private $listProjectsCommand;
+
+    /**
+     * @var ListTasksCommand
+     */
+    private $listTasksCommand;
+
+    public function __construct(ListProjectsCommand $listProjectsCommand, ListTasksCommand $listTasksCommand)
     {
         $this->projectMappings = config('freshbooks-importer.freshbooks-classic.harvest.projects-mappings');
         $this->tasksMapping = config('freshbooks-importer.freshbooks-classic.harvest.tasks-mappings');
+        $this->listProjectsCommand = $listProjectsCommand;
+        $this->listTasksCommand = $listTasksCommand;
     }
 
     public function consume(string $csvPath, Command $console)
@@ -31,17 +55,27 @@ class FreshbooksClassic
 
         $records = $this->getCsvRecords($csvPath);
 
+        $timeEntriesMapped = [];
         foreach ($records as $record) {
-            $timeEntryMapped = $this->mapRecord($record);
+            $timeEntriesMapped[] = $this->mapRecord($record);
+        }
 
+        $this->checkIfUnknownProjectsAndTasks($console);
+
+        if ($this->unknownProjects || $this->unknownTasks) {
+            $message = 'An unknown Project or Task was encountered. Please add these mappings to the '
+                . 'freshbooks-importer config file and then re-run the import.';
+
+            return $console->error($message);
+        }
+
+        foreach ($timeEntriesMapped as $timeEntryMapped) {
             $console->comment($this->varExport($timeEntryMapped));
-
             $response = $this->createTimeEntry($timeEntryMapped);
-
             $console->comment($this->varExport($response));
         }
 
-        $console->comment('done');
+        $console->comment('Time entries were uploaded');
     }
 
     public function listTasksHeaders()
@@ -167,12 +201,45 @@ class FreshbooksClassic
      */
     private function mapRecord($record): array
     {
+        $projectName = $record['Project'];
+        $taskName = $record['Task'];
+
+        if (!isset($this->projectMappings[$projectName])) {
+            $this->unknownProjects[] = $projectName;
+        }
+
+        if (!isset($this->tasksMapping[$taskName])) {
+            $this->unknownTasks[] = $taskName;
+        }
+
         return [
-            'project_id' => $this->projectMappings[$record['Project']],
-            'task_id' => $this->tasksMapping[$record['Task']],
+            'project_id' => $this->projectMappings[$projectName] ?? null,
+            'task_id' => $this->tasksMapping[$taskName] ?? null,
             'hours' => $record['Hours'],
             'date' => $record['Date'],
             'notes' => $record['Notes']
         ];
+    }
+
+    /**
+     * @param Command $console
+     */
+    private function checkIfUnknownProjectsAndTasks(Command $console)
+    {
+        $wrapWithArray = function ($item) {
+            return [$item];
+        };
+
+        if ($this->unknownProjects) {
+            $console->table(['Unknown Project'], array_map($wrapWithArray, array_unique($this->unknownProjects)));
+            $console->info("Here's the list of projects in Freshbooks");
+            $console->call($this->listProjectsCommand->getName());
+        }
+
+        if ($this->unknownTasks) {
+            $console->table(['Unknown Tasks'], array_map($wrapWithArray, array_unique($this->unknownTasks)));
+            $console->info("Here's the list of tasks in Freshbooks");
+            $console->call($this->listTasksCommand->getName());
+        }
     }
 }
