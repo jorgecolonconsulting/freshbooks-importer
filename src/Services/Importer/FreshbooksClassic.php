@@ -14,7 +14,7 @@ use Freshbooks\FreshBooksApi;
 use Illuminate\Console\Command;
 use League\Csv\Reader;
 
-class FreshbooksClassic
+class FreshbooksClassic implements HarvestImporterAdapterInterface
 {
     /**
      * @var FreshBooksApi
@@ -49,6 +49,10 @@ class FreshbooksClassic
         $this->listTasksCommand = $listTasksCommand;
     }
 
+    /**
+     * @param string $csvPath
+     * @param Command $console
+     */
     public function consume(string $csvPath, Command $console)
     {
         $this->connectApi();
@@ -175,8 +179,8 @@ class FreshbooksClassic
      */
     private function initializeApiConnection(): FreshBooksApi
     {
-        $domain = '2upmedia'; // Do not include the URL scheme (https://). It will be added automatically
-        $token = 'e35b9984c6355b45da77855c67730c2b'; // your api token found in your account
+        $domain = config('freshbooks-importer.freshbooks-classic.subdomain'); // Do not include the URL scheme (https://). It will be added automatically
+        $token = config('freshbooks-importer.freshbooks-classic.authentication-token'); // your api token found in your account
         $fb = new FreshBooksApi($domain, $token);
 
         return $fb;

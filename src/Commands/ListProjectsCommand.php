@@ -9,6 +9,8 @@
 namespace _2UpMedia\FreshbooksImporter\Commands;
 
 use _2UpMedia\FreshbooksImporter\Importer\FreshbooksClassic;
+use _2UpMedia\FreshbooksImporter\Service;
+use _2UpMedia\FreshbooksImporter\Services\Freshbooks\ListProjects;
 use Illuminate\Console\Command;
 
 class ListProjectsCommand extends Command
@@ -32,8 +34,12 @@ class ListProjectsCommand extends Command
      *
      * @return mixed
      */
-    public function handle(FreshbooksClassic $freshbooksClassic)
+    public function handle(FreshbooksClassic $freshbooksClassic, ListProjects $listProjects)
     {
-        $this->table($freshbooksClassic->listProjectsHeaders(), $freshbooksClassic->listProjects());
+        if (config('freshbooks-importer.freskbooks-version') === Service::VERSION_FRESHBOOKS) {
+            $this->table($listProjects->headers(), $listProjects->rows());
+        } else {
+            $this->table($freshbooksClassic->listProjectsHeaders(), $freshbooksClassic->listProjects());
+        }
     }
 }

@@ -10,36 +10,36 @@ namespace _2UpMedia\FreshbooksImporter\Commands;
 
 use _2UpMedia\FreshbooksImporter\Importer\FreshbooksClassic;
 use _2UpMedia\FreshbooksImporter\Service;
-use _2UpMedia\FreshbooksImporter\Services\Freshbooks\ListTasks;
+use _2UpMedia\FreshbooksImporter\Services\Freshbooks\ListClients;
 use Illuminate\Console\Command;
 
-class ListTasksCommand extends Command
+class ListClientsCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'freshbooks-importer:list-tasks';
+    protected $signature = 'freshbooks-importer:list-clients';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'List Freshbooks Tasks';
+    protected $description = 'List Freshbooks Clients';
 
     /**
      * Execute the console command.
      *
      * @return mixed
      */
-    public function handle(FreshbooksClassic $freshbooksClassic, ListTasks $listTasks)
+    public function handle(FreshbooksClassic $freshbooksClassic, ListClients $listClients)
     {
         if (config('freshbooks-importer.freskbooks-version') === Service::VERSION_FRESHBOOKS) {
-            $this->table($listTasks->headers(), $listTasks->rows());
+            $this->table($listClients->headers(), $listClients->rows());
         } else {
-            $this->table($freshbooksClassic->listTasksHeaders(), $freshbooksClassic->listTasks());
+            $this->table($freshbooksClassic->listProjectsHeaders(), $freshbooksClassic->listProjects());
         }
     }
 }

@@ -14,7 +14,10 @@
         "illuminate/console": "^5.5",
         "illuminate/support": "^5.5",
         "league/csv": "^9.0",
-        "rtconner/freshbooks-api": "^1.0"
+        "rtconner/freshbooks-api": "^1.0",
+        "illuminate/routing": "^5.5",
+        "kamermans/guzzle-oauth2-subscriber": "1.0.5-beta.1",
+        "guzzlehttp/guzzle": "^6.3"
     },
     "autoload": {
         "psr-4": {
@@ -24,7 +27,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "_2UpMedia\\FreshbooksImporter\\FreshbooksImporterServiceProvider"
+                "_2UpMedia\\FreshbooksImporter\\Providers\\FreshbooksImporterServiceProvider",
+                "_2UpMedia\\FreshbooksImporter\\Providers\\OauthCallbackRouteProvider"
             ]
         }
     }

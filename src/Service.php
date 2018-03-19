@@ -12,6 +12,9 @@ use _2UpMedia\FreshbooksImporter\Commands\ConfigurePackageCommand;
 
 class Service
 {
+    const VERSION_FRESHBOOKS_CLASSIC = 'freshbooks-classic';
+    const VERSION_FRESHBOOKS = 'freshbooks';
+
     private $configureCommand;
 
     public function __construct(ConfigurePackageCommand $command)

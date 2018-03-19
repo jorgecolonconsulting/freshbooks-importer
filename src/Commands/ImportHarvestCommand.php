@@ -8,7 +8,9 @@
 
 namespace _2UpMedia\FreshbooksImporter\Commands;
 
+use _2UpMedia\FreshbooksImporter\Importer\Freshbooks;
 use _2UpMedia\FreshbooksImporter\Importer\FreshbooksClassic;
+use _2UpMedia\FreshbooksImporter\Service;
 use Illuminate\Console\Command;
 
 class ImportHarvestCommand extends Command
@@ -32,11 +34,15 @@ class ImportHarvestCommand extends Command
      *
      * @return mixed
      */
-    public function handle(FreshbooksClassic $freshbooksClassic)
+    public function handle(FreshbooksClassic $freshbooksClassic, Freshbooks $freshbooks)
     {
         $csvPath = $this->argument('csvPath');
 
-        $freshbooksClassic->consume($csvPath, $this);
+        if (config('freshbooks-importer.freskbooks-version') === Service::VERSION_FRESHBOOKS) {
+            $freshbooks->consume($csvPath, $this);
+        } else {
+            $freshbooksClassic->consume($csvPath, $this);
+        }
 
         $this->comment("Import done");
     }
