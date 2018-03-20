@@ -25,7 +25,7 @@ Import Harvest time entries into Freshbooks Cloud Accounting or Freshbooks Class
 4. Create a Freshbooks app here https://my.freshbooks.com/#/developer. Add any redirect URI with an https:// scheme. We will replace it later.
 5. Copy Client ID, Client Secret, Authorization URL to config/freshbooks-importer.php. Also add mappings. Set `freshbooks-version` to `freshbooks`.
 6. Run `$ ./artisan serve`
-7. Expose local artisan web development server port with ngrok to get a publically accessible SSL URL. Copy generate https:// ngrok URL and replace the Redirect URI with https://GENERATE-ID.ngrok.io/freshbooks-importer/oauth/redirect. 
-8. Visit https://GENERATE-ID.ngrok.io/freshbooks-importer/oauth/authorize
+7. Expose local artisan web development server port with ngrok to get a publically accessible SSL URL. Copy generate https:// ngrok URL and replace the Redirect URI with https://GENERATED-ID.ngrok.io/freshbooks-importer/oauth/redirect. 
+8. Visit https://GENERATED-ID.ngrok.io/freshbooks-importer/oauth/authorize
 9. You will be redirected to authorize the application.
 10. Follow the same process as above starting at 7.
